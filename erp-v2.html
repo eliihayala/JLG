@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b2130">
+<title>JLG Control · ERP Zona Franca</title>
+<link rel="stylesheet" href="erp-v2.css?v=1">
+</head>
+<body>
+<section id="login" class="login">
+  <div class="visual"><img src="jlg-logo.png" alt="Logo JLG"></div>
+  <div class="login-side"><div class="login-box">
+    <div class="eyebrow">ERP especializado en Zona Franca</div>
+    <h1>Una plataforma para toda la operación.</h1>
+    <p class="muted">Clientes, RET, ZFI5, tránsitos, stock, egresos y administración.</p>
+    <div class="field"><label>Usuario</label><input value="karen@jlg.com.ar"></div>
+    <div class="field"><label>Contraseña</label><input id="password" type="password" value="demo123"></div>
+    <div class="roles">
+      <button id="internalRole" class="role active"><b>Gestión interna</b><small>Todos los módulos</small></button>
+      <button id="clientRole" class="role"><b>Portal del cliente</b><small>Información de una empresa</small></button>
+    </div>
+    <div id="loginClientBox" class="field hidden"><label>Seleccionar cliente</label><select id="loginClient">
+      <option value="EGT">EGT ARGENTINA S.A.</option><option value="Yamaha">YAMAHA MOTOR ARGENTINA S.A.</option><option value="ZMG">ZMG ARGENTINA S.R.L.</option><option value="Ferrum">FERRUM S.A.</option><option value="Cetrogar">CETROGAR S.A.</option><option value="Mondial">MONDIAL</option><option value="MRT">METALÚRGICA RÍO TERCERO S.A.</option><option value="OTR">OTR MAX</option><option value="Syensqo">SYENSQO ARGENTINA S.A.</option><option value="Prevent">PREVENT GAS</option><option value="Lilus">LILUS</option><option value="Pampa">PAMPA</option><option value="Logexpor">LOGEXPOR</option><option value="Bracol">BRACOL</option>
+    </select></div>
+    <button id="loginButton" class="btn primary" style="width:100%;margin-top:18px">Ingresar</button>
+    <div class="muted small" style="margin-top:9px">Contraseña de demostración: demo123</div>
+  </div></div>
+</section>
+<section id="app" class="hidden">
+<header class="topbar">
+  <div class="brand"><button id="menuButton" class="btn ghost menu-btn" aria-label="Abrir menú">☰</button><img src="jlg-logo.png" alt="JLG"><div><b>JLG Control</b><small id="environment">Gestión interna</small></div></div>
+  <div class="top-actions"><select id="globalClient" aria-label="Cliente activo">
+    <option value="EGT">EGT ARGENTINA S.A.</option><option value="Yamaha">YAMAHA MOTOR ARGENTINA S.A.</option><option value="ZMG">ZMG ARGENTINA S.R.L.</option><option value="Ferrum">FERRUM S.A.</option><option value="Cetrogar">CETROGAR S.A.</option><option value="Mondial">MONDIAL</option><option value="MRT">METALÚRGICA RÍO TERCERO S.A.</option><option value="OTR">OTR MAX</option><option value="Syensqo">SYENSQO ARGENTINA S.A.</option><option value="Prevent">PREVENT GAS</option><option value="Lilus">LILUS</option><option value="Pampa">PAMPA</option><option value="Logexpor">LOGEXPOR</option><option value="Bracol">BRACOL</option>
+  </select><span id="userPill" class="pill">Karen · Administradora</span><button id="changeRole" class="btn ghost">Perfil</button><button id="logout" class="btn ghost">Salir</button></div>
+</header>
+<div class="shell">
+<aside id="sidebar" class="sidebar"><div class="nav">
+  <div class="nav-title">JLG Control</div>
+  <div class="group">Operaciones</div>
+  <button class="active" data-module="inicio">⌂ Inicio</button>
+  <button data-module="clientes">◉ Clientes y contratos</button>
+  <button data-module="ingresos">⇩ Ingresos RET</button>
+  <button data-module="stock">▦ Stock y trazabilidad</button>
+  <button data-module="egresos">⇧ Egresos y reexpediciones</button>
+  <button data-module="operaciones">⇄ Operaciones / ZFI5</button>
+  <div class="group internal-only">Administración</div>
+  <button class="internal-only" data-module="facturacion">$ Facturación</button>
+  <button class="internal-only" data-module="cuentas">≋ Cuentas corrientes</button>
+  <button class="internal-only" data-module="proveedores">▣ Proveedores y OP</button>
+  <button class="internal-only" data-module="tesoreria">◆ Tesorería</button>
+  <div class="group">Gestión</div>
+  <button data-module="notificaciones">🔔 Notificaciones</button>
+  <button class="internal-only" data-module="rezago">⚑ Mercadería en rezago</button>
+  <button class="internal-only" data-module="contabilidad">∑ Contabilidad</button>
+  <button class="internal-only" data-module="tarifas">% Tarifas</button>
+  <button class="internal-only" data-module="reportes">▥ Reportes</button>
+  <button class="internal-only" data-module="seguridad">⚙ Usuarios y auditoría</button>
+</div></aside>
+<div id="scrim" class="scrim hidden"></div>
+<main class="main"><div id="view"></div></main>
+</div>
+</section>
+<script>window.EGT=[];</script>
+<script src="egt1.js"></script><script src="egt2.js"></script><script src="egt3.js"></script><script src="egt4.js"></script><script src="egt5.js"></script><script src="egt6.js"></script>
+<script src="erp-app.js?v=8"></script>
+<script src="home-patch.js?v=1"></script>
+</body>
+</html>
