@@ -16,9 +16,9 @@
   const errorBox=document.getElementById('error');
   try{
     if(!('DecompressionStream' in window)) throw new Error('Este navegador necesita actualizarse para abrir la aplicación.');
-    const files=['payload/jlg-v8-1.txt','payload/jlg-v8-2.txt','payload/jlg-v8-3.txt','payload/jlg-v8-4.txt','payload/jlg-v8-5.txt'];
+    const files=['payload/jlg-v9-1.txt','payload/jlg-v9-2.txt','payload/jlg-v9-3.txt','payload/jlg-v9-4.txt','payload/jlg-v9-5.txt'];
     const parts=await Promise.all(files.map(async function(path){
-      const response=await fetch(path+'?v=8',{cache:'no-store'});
+      const response=await fetch(path+'?v=9',{cache:'no-store'});
       if(!response.ok) throw new Error('No se pudo cargar '+path+' ('+response.status+').');
       return (await response.text()).trim();
     }));
@@ -28,9 +28,7 @@
     const decompressed=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
     const html=await new Response(decompressed).text();
     if(!html.startsWith('<!doctype html>')) throw new Error('El contenido de la aplicación no es válido.');
-    document.open();
-    document.write(html);
-    document.close();
+    document.open();document.write(html);document.close();
   }catch(error){
     console.error(error);
     document.querySelector('.spinner').style.display='none';
