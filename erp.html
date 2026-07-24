@@ -6,35 +6,57 @@
 <meta name="theme-color" content="#092738">
 <title>JLG Control · Cargando</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f3f7f9;color:#173345}.loading{min-height:100vh;display:grid;place-items:center;padding:24px}.box{width:min(430px,100%);background:#fff;border:1px solid #dce7ec;border-radius:20px;padding:30px;text-align:center;box-shadow:0 16px 44px rgba(13,53,73,.12)}.logo{width:112px;max-height:82px;object-fit:contain;margin-bottom:16px}.spinner{width:42px;height:42px;margin:18px auto;border:4px solid #dff3fb;border-top-color:#1699d2;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}h1{font-size:22px;margin:0 0 8px}p{color:#6e8290;margin:0;line-height:1.5}.error{color:#a83c3c;background:#fff0f0;border:1px solid #efcaca;border-radius:12px;padding:12px;margin-top:16px;text-align:left;display:none}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f3f7f9;color:#173345}.loading{min-height:100vh;display:grid;place-items:center;padding:24px}.box{width:min(460px,100%);background:#fff;border:1px solid #dce7ec;border-radius:20px;padding:30px;text-align:center;box-shadow:0 16px 44px rgba(13,53,73,.12)}.logo{width:112px;max-height:82px;object-fit:contain;margin-bottom:16px}.spinner{width:42px;height:42px;margin:18px auto;border:4px solid #dff3fb;border-top-color:#1699d2;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}h1{font-size:22px;margin:0 0 8px}p{color:#6e8290;margin:0;line-height:1.5}.status{margin-top:12px;font-size:13px;color:#287da3}.error{color:#a83c3c;background:#fff0f0;border:1px solid #efcaca;border-radius:12px;padding:12px;margin-top:16px;text-align:left;display:none}.retry{display:none;margin:14px auto 0;border:0;border-radius:10px;padding:10px 15px;background:#1699d2;color:#fff;font-weight:750;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="loading"><div class="box"><img class="logo" src="jlg-logo.png" alt="JLG"><h1>Cargando JLG Control</h1><div class="spinner"></div><p>Preparando la gestión operativa y el portal de clientes.</p><div id="error" class="error"></div></div></div>
+<div class="loading"><div class="box"><img class="logo" src="jlg-logo.png" alt="JLG"><h1>Cargando JLG Control</h1><div class="spinner"></div><p>Preparando la gestión operativa y el portal de clientes.</p><div id="status" class="status">Iniciando…</div><div id="error" class="error"></div><button id="retry" class="retry" type="button">Volver a intentar</button></div></div>
 <script>
-(async function(){
+(function(){
+  const version='9';
+  const names=['jlg-v9-1.txt','jlg-v9-2.txt','jlg-v9-3.txt','jlg-v9-4.txt','jlg-v9-5.txt'];
+  const status=document.getElementById('status');
   const errorBox=document.getElementById('error');
-  try{
-    if(!('DecompressionStream' in window)) throw new Error('Este navegador necesita actualizarse para abrir la aplicación.');
-    const files=['payload/jlg-v9-1.txt','payload/jlg-v9-2.txt','payload/jlg-v9-3.txt','payload/jlg-v9-4.txt','payload/jlg-v9-5.txt'];
-    const parts=await Promise.all(files.map(async function(path){
-      const response=await fetch(path+'?v=9',{cache:'no-store'});
-      if(!response.ok) throw new Error('No se pudo cargar '+path+' ('+response.status+').');
-      return (await response.text()).trim();
-    }));
-    const binary=atob(parts.join(''));
-    const bytes=new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    const decompressed=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    const html=await new Response(decompressed).text();
-    if(!html.startsWith('<!doctype html>')) throw new Error('El contenido de la aplicación no es válido.');
-    document.open();document.write(html);document.close();
-  }catch(error){
-    console.error(error);
-    document.querySelector('.spinner').style.display='none';
-    errorBox.style.display='block';
-    errorBox.textContent='No se pudo abrir JLG Control: '+error.message+' Recargá la página e intentá nuevamente.';
+  const retryButton=document.getElementById('retry');
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function fetchText(url,attempts){
+    let lastError;
+    for(let attempt=1;attempt<=attempts;attempt++){
+      try{
+        const response=await fetch(url+(url.includes('?')?'&':'?')+'v='+version+'&t='+Date.now(),{cache:'no-store'});
+        if(!response.ok) throw new Error('HTTP '+response.status);
+        const text=(await response.text()).trim();
+        if(!text) throw new Error('archivo vacío');
+        return text;
+      }catch(error){lastError=error;if(attempt<attempts) await wait(700*attempt);}
+    }
+    throw lastError;
   }
+  async function getPart(name,index){
+    status.textContent='Cargando información '+(index+1)+' de '+names.length+'…';
+    try{return await fetchText('payload/'+name,3);}
+    catch(firstError){return await fetchText('https://raw.githubusercontent.com/eliihayala/JLG/main/payload/'+name,3);}
+  }
+  async function start(){
+    errorBox.style.display='none';retryButton.style.display='none';document.querySelector('.spinner').style.display='block';
+    try{
+      if(!('DecompressionStream' in window)) throw new Error('Tu navegador necesita actualizarse para abrir esta versión del sistema');
+      const parts=[];
+      for(let i=0;i<names.length;i++) parts.push(await getPart(names[i],i));
+      status.textContent='Abriendo el sistema…';
+      const binary=atob(parts.join(''));
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+      const decompressed=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+      const html=await new Response(decompressed).text();
+      if(!/^<!doctype html>/i.test(html.trim())) throw new Error('El contenido descargado no es válido');
+      document.open();document.write(html);document.close();
+    }catch(error){
+      console.error(error);document.querySelector('.spinner').style.display='none';status.textContent='';errorBox.style.display='block';retryButton.style.display='inline-block';
+      errorBox.textContent='No se pudo abrir JLG Control: '+(error&&error.message?error.message:'error de conexión')+'. Verificá la conexión y presioná “Volver a intentar”.';
+    }
+  }
+  retryButton.addEventListener('click',start);start();
 })();
 </script>
 </body>
